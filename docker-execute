@@ -1,0 +1,303 @@
+#!/bin/zsh
+
+set -eu
+
+CONTAINERS_JSON=".containers.json"
+
+declare self interactive pseudotty color lang
+
+self=$(basename $0)
+interactive=false
+pseudotty=false
+color=false
+lang=false
+
+# functions
+
+function __warn {
+	echo "$1" >&2
+}
+
+function __die {
+	__warn "${self}: $1"
+	exit 1
+}
+
+function __encode() {
+	if [[ -p /dev/stdout ]]; then
+		cat - | sed -E 's/\\e[[0-9]*m//g'
+	else
+		cat - | sed -E 's/\\e//g'
+	fi
+}
+
+function __assert_jq_installed {
+	if ! which jq &> /dev/null; then
+		__die "'jq' command not installed."
+	fi
+}
+
+function __assert_found {
+	if [ ! -f "${PWD}/$1" ]; then
+		__die "'$1' not found."
+	fi
+}
+
+function __assert_container_run {
+	if ! docker ps | grep "$1" > /dev/null 2>&1; then
+		__die "docker container '$1' is not running."
+	fi
+}
+
+function __get_default_container {
+	echo -n "${PWD##*/}-$1"
+}
+
+function __get_container {
+	local suffix=$1
+	local -a keys=($@[2,-1])
+	local container
+
+	if [ ! -f "${PWD}/${CONTAINERS_JSON}" ]; then
+		__get_default_container "${suffix}"
+	else
+		__assert_jq_installed
+
+		while (( $#keys > 0 )); do
+			container=$(cat "${PWD}/${CONTAINERS_JSON}" | \jq -r ".$keys[1]")
+			if [ "${container}" != "null" ]; then
+				echo -n "${container}"
+				return
+			fi
+			shift keys
+		done
+
+		__get_default_container "${suffix}"
+	fi
+}
+
+function __get_docker_options {
+	local -a options
+
+	if $interactive; then
+		options=($options "-i")
+	fi
+
+	if $pseudotty; then
+		options=($options "-t")
+	fi
+
+	if $color; then
+		options=($options "-e" "TERM=xterm-256color")
+	fi
+
+	if $lang; then
+		options=($options "-e" "LANG=${LANG}")
+	fi
+
+	echo -n $options
+}
+
+function __docker {
+	local -a options=($(__get_docker_options))
+
+	__assert_container_run "$1"
+
+	docker exec ${options} "$@"
+}
+
+# executors
+
+function __execute {
+	local container=$(__get_container app app)
+
+	__docker ${container} "$@"
+}
+
+function __execute_php {
+	local container=$(__get_container app php app)
+
+	__docker ${container} php -d memory_limit=-1 "$@"
+}
+
+function __execute_composer {
+	__execute_php /usr/local/bin/composer "$@"
+}
+
+function __execute_artisan {
+	__assert_found artisan
+
+	__execute_php artisan "$@"
+}
+
+function __execute_phpstan {
+	__execute_php ./vendor/bin/phpstan "$@"
+}
+
+function __execute_phpunit {
+	__execute_php ./vendor/bin/phpunit $*
+}
+
+function __execute_node {
+	local container=$(__get_container nodejs nodejs app)
+
+	__docker ${container} "node" "$@"
+}
+
+function __execute_yarn {
+	local container=$(__get_container nodejs nodejs app)
+
+	__docker ${container} yarn "$@"
+}
+
+function __execute_bundle {
+	local container=$(__get_container app ruby app)
+
+	__docker ${container} bundle "$@"
+}
+
+function __execute_rails {
+	local container=$(__get_container app ruby app)
+
+	__docker ${container} rails "$@"
+}
+
+function __execute_rspec {
+	__execute_bundle exec rspec "$@"
+}
+
+function __execute_mysql {
+	local container=$(__get_container mysql mysql)
+
+	__docker ${container} mysql "$@"
+}
+
+function __help {
+	cat <<HELP | __encode
+\e[33mUSAGE:\e[m
+  docker-execute [OPTIONS] [-C COMMANDS] -- [ARGUMENTS]
+
+\e[33mOPTIONS:\e[m
+  \e[32m-i, --interactive   \e[mKeep stdin open even if not attached
+  \e[32m-t, --tty           \e[mAllocate a pseudo-tty
+  \e[32m--color             \e[mSet xterm-256color to TERM
+  \e[32m--lang              \e[mSet current LANG to LANG
+  \e[32m--help              \e[mDisplay this help
+
+\e[33mCOMMANDS:\e[m
+  \e[32m$@\e[m
+HELP
+}
+
+# main
+
+function main {
+	local -a commands
+	local command="command"
+
+	commands=(php composer artisan phpstan phpunit node yarn bundle rails rspec mysql)
+
+	if [[ $# -eq 0 ]]; then
+		__help $commands
+		exit 0
+	fi
+
+	while (( $# > 0 )); do
+		case "$1" in
+			-C|--command)
+				if [ $# -le 1 ]; then
+					__die "option requires an argument -- 'C'"
+				fi
+				command="$2"
+				shift
+				;;
+			-i|--interactive)
+				interactive=true
+				;;
+			--no-interactive)
+				interactive=false
+				;;
+			-t|--tty)
+				pseudotty=true
+				;;
+			--no-tty)
+				pseudotty=false
+				;;
+			-it)
+				interactive=true
+				pseudotty=true
+				;;
+			--color)
+				color=true
+				;;
+			--no-color)
+				color=false
+				;;
+			--lang)
+				lang=true
+				;;
+			--no-lang)
+				lang=false
+				;;
+			--debug)
+				set -x
+				;;
+			-h|--help)
+				__help $commands
+				exit 0
+				;;
+			--)
+				shift
+				break
+				;;
+			*)
+				break
+		esac
+		shift
+	done
+
+	case "$command" in
+		php)
+			__execute_php "$@"
+			;;
+		composer)
+			__execute_composer "$@"
+			;;
+		artisan)
+			__execute_artisan "$@"
+			;;
+		phpstan)
+			__execute_phpstan "$@"
+			;;
+		phpunit)
+			__execute_phpunit "$@"
+			;;
+		node)
+			__execute_node "$@"
+			;;
+		yarn)
+			__execute_yarn "$@"
+			;;
+		bundle)
+			__execute_bundle "$@"
+			;;
+		rails)
+			__execute_rails "$@"
+			;;
+		rspec)
+			__execute_rspec "$@"
+			;;
+		mysql)
+			__execute_mysql "$@"
+			;;
+		command)
+			__execute "$@"
+			;;
+		*)
+			__die "'${command}' is invalid command."
+	esac
+
+	return $?
+}
+
+main "$@"
