@@ -1,0 +1,3 @@
+#!/bin/zsh
+
+docker-execute -it --color --lang -- "$@"
