@@ -121,7 +121,9 @@ function __execute_php {
 }
 
 function __execute_composer {
-	__execute_php /usr/local/bin/composer "$@"
+	local container=$(__get_container app php app)
+
+	__docker ${container} composer "$@"
 }
 
 function __execute_artisan {
