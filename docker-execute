@@ -164,6 +164,12 @@ function __execute_rails {
 	__docker ${container} rails "$@"
 }
 
+function __execute_hanami {
+	local container=$(__get_container app ruby app)
+
+	__docker ${container} hanami "$@"
+}
+
 function __execute_rspec {
 	__execute_bundle exec rspec "$@"
 }
@@ -197,7 +203,7 @@ function main {
 	local -a commands
 	local command="command"
 
-	commands=(php composer artisan phpstan phpunit node yarn bundle rails rspec mysql)
+	commands=(php composer artisan phpstan phpunit node yarn bundle rails hanami rspec mysql)
 
 	if [[ $# -eq 0 ]]; then
 		__help $commands
@@ -285,6 +291,9 @@ function main {
 			;;
 		rails)
 			__execute_rails "$@"
+			;;
+		hanami)
+			__execute_hanami "$@"
 			;;
 		rspec)
 			__execute_rspec "$@"

@@ -12,6 +12,7 @@ install:
 	$(LN) -sf $(ALIAS_DIR)/yarn-exec $(DIST_DIR)/yarn-exec
 	$(LN) -sf $(ALIAS_DIR)/bundle-exec $(DIST_DIR)/bundle-exec
 	$(LN) -sf $(ALIAS_DIR)/rails-exec $(DIST_DIR)/rails-exec
+	$(LN) -sf $(ALIAS_DIR)/hanami-exec $(DIST_DIR)/hanami-exec
 	$(LN) -sf $(ALIAS_DIR)/rspec-exec $(DIST_DIR)/rspec-exec
 	$(LN) -sf $(ALIAS_DIR)/mysql-exec $(DIST_DIR)/mysql-exec
 
@@ -23,6 +24,7 @@ uninstall:
 	$(RM) -f $(DIST_DIR)/yarn-exec
 	$(RM) -f $(DIST_DIR)/bundle-exec
 	$(RM) -f $(DIST_DIR)/rails-exec
+	$(RM) -f $(DIST_DIR)/hanami-exec
 	$(RM) -f $(DIST_DIR)/rspec-exec
 	$(RM) -f $(DIST_DIR)/mysql-exec
 
