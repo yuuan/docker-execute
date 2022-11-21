@@ -159,9 +159,7 @@ function __execute_bundle {
 }
 
 function __execute_rails {
-	local container=$(__get_container app ruby app)
-
-	__docker ${container} rails "$@"
+	__execute_bundle exec rails "$@"
 }
 
 function __execute_hanami {
