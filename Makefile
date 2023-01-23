@@ -9,6 +9,7 @@ install:
 	$(LN) -sf $(ALIAS_DIR)/artisan-exec $(DIST_DIR)/artisan-exec
 	$(LN) -sf $(ALIAS_DIR)/phpstan-exec $(DIST_DIR)/phpstan-exec
 	$(LN) -sf $(ALIAS_DIR)/phpunit-exec $(DIST_DIR)/phpunit-exec
+	$(LN) -sf $(ALIAS_DIR)/node-exec $(DIST_DIR)/node-exec
 	$(LN) -sf $(ALIAS_DIR)/yarn-exec $(DIST_DIR)/yarn-exec
 	$(LN) -sf $(ALIAS_DIR)/bundle-exec $(DIST_DIR)/bundle-exec
 	$(LN) -sf $(ALIAS_DIR)/rails-exec $(DIST_DIR)/rails-exec
@@ -21,6 +22,7 @@ uninstall:
 	$(RM) -f $(DIST_DIR)/artisan-exec
 	$(RM) -f $(DIST_DIR)/phpstan-exec
 	$(RM) -f $(DIST_DIR)/phpunit-exec
+	$(RM) -f $(DIST_DIR)/node-exec
 	$(RM) -f $(DIST_DIR)/yarn-exec
 	$(RM) -f $(DIST_DIR)/bundle-exec
 	$(RM) -f $(DIST_DIR)/rails-exec
