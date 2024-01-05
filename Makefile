@@ -5,6 +5,8 @@ LN := /bin/ln
 RM := /bin/rm
 
 install:
+	$(LN) -sf $(ALIAS_DIR)/go-exec $(DIST_DIR)/go-exec
+	$(LN) -sf $(ALIAS_DIR)/gotest-exec $(DIST_DIR)/gotest-exec
 	$(LN) -sf $(ALIAS_DIR)/composer-exec $(DIST_DIR)/composer-exec
 	$(LN) -sf $(ALIAS_DIR)/artisan-exec $(DIST_DIR)/artisan-exec
 	$(LN) -sf $(ALIAS_DIR)/phpstan-exec $(DIST_DIR)/phpstan-exec
@@ -18,6 +20,8 @@ install:
 	$(LN) -sf $(ALIAS_DIR)/mysql-exec $(DIST_DIR)/mysql-exec
 
 uninstall:
+	$(RM) -f $(DIST_DIR)/go-exec
+	$(RM) -f $(DIST_DIR)/gotest-exec
 	$(RM) -f $(DIST_DIR)/composer-exec
 	$(RM) -f $(DIST_DIR)/artisan-exec
 	$(RM) -f $(DIST_DIR)/phpstan-exec
