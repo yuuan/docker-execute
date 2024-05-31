@@ -129,7 +129,7 @@ function __execute_gotest {
 function __execute_gofmt {
 	local container=$(__get_container app go app)
 
-	__docker ${container} golangci-lint run --disable-all -E gofmt -E gci --fix -- "$@"
+	__docker ${container} golangci-lint run --disable-all --enable gofmt --enable gci --fix -- "$@"
 }
 
 function __execute_php {
