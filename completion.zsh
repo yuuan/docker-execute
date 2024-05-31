@@ -1,3 +1,4 @@
+compdef '_dispatch go' go-exec
 compdef '_dispatch composer composer' composer-exec
 compdef '_dispatch artisan artisan' artisan-exec
 compdef '_dispatch npm npm' npm-exec

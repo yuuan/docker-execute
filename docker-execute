@@ -231,7 +231,7 @@ function main {
 	local -a commands
 	local command="command"
 
-	commands=(php composer artisan phpstan phpunit node npm yarn pnpm bundle rails hanami rspec mysql)
+	commands=(go gotest gofmt php composer artisan phpstan phpunit node npm yarn pnpm bundle rails hanami rspec mysql)
 
 	if [[ $# -eq 0 ]]; then
 		__help $commands
