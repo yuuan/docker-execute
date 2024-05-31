@@ -13,7 +13,9 @@ install:
 	$(LN) -sf $(ALIAS_DIR)/phpstan-exec $(DIST_DIR)/phpstan-exec
 	$(LN) -sf $(ALIAS_DIR)/phpunit-exec $(DIST_DIR)/phpunit-exec
 	$(LN) -sf $(ALIAS_DIR)/node-exec $(DIST_DIR)/node-exec
+	$(LN) -sf $(ALIAS_DIR)/npm-exec $(DIST_DIR)/npm-exec
 	$(LN) -sf $(ALIAS_DIR)/yarn-exec $(DIST_DIR)/yarn-exec
+	$(LN) -sf $(ALIAS_DIR)/pnpm-exec $(DIST_DIR)/pnpm-exec
 	$(LN) -sf $(ALIAS_DIR)/bundle-exec $(DIST_DIR)/bundle-exec
 	$(LN) -sf $(ALIAS_DIR)/rails-exec $(DIST_DIR)/rails-exec
 	$(LN) -sf $(ALIAS_DIR)/hanami-exec $(DIST_DIR)/hanami-exec
@@ -29,7 +31,9 @@ uninstall:
 	$(RM) -f $(DIST_DIR)/phpstan-exec
 	$(RM) -f $(DIST_DIR)/phpunit-exec
 	$(RM) -f $(DIST_DIR)/node-exec
+	$(RM) -f $(DIST_DIR)/npm-exec
 	$(RM) -f $(DIST_DIR)/yarn-exec
+	$(RM) -f $(DIST_DIR)/pnpm-exec
 	$(RM) -f $(DIST_DIR)/bundle-exec
 	$(RM) -f $(DIST_DIR)/rails-exec
 	$(RM) -f $(DIST_DIR)/hanami-exec

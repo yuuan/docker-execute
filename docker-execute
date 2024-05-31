@@ -164,10 +164,22 @@ function __execute_node {
 	__docker ${container} "node" "$@"
 }
 
+function __execute_npm {
+	local container=$(__get_container nodejs nodejs app)
+
+	__docker ${container} npm "$@"
+}
+
 function __execute_yarn {
 	local container=$(__get_container nodejs nodejs app)
 
 	__docker ${container} yarn "$@"
+}
+
+function __execute_pnpm {
+	local container=$(__get_container nodejs nodejs app)
+
+	__docker ${container} pnpm "$@"
 }
 
 function __execute_bundle {
@@ -219,7 +231,7 @@ function main {
 	local -a commands
 	local command="command"
 
-	commands=(php composer artisan phpstan phpunit node yarn bundle rails hanami rspec mysql)
+	commands=(php composer artisan phpstan phpunit node npm yarn pnpm bundle rails hanami rspec mysql)
 
 	if [[ $# -eq 0 ]]; then
 		__help $commands
@@ -308,8 +320,14 @@ function main {
 		node)
 			__execute_node "$@"
 			;;
+		npm)
+			__execute_npm "$@"
+			;;
 		yarn)
 			__execute_yarn "$@"
+			;;
+		pnpm)
+			__execute_pnpm "$@"
 			;;
 		bundle)
 			__execute_bundle "$@"
